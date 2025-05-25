@@ -3,7 +3,7 @@
 // C -> Warte auf Catch -> C
 // T -> Warte auf Wurf -> T
 
-String testbefehl1 = "CFF000000FF00";
+String testbefehl1 = "LFF000000FF00";
 String testbefehl2 = "D000000000500";
 String testbefehl3 = "L00FF000000FF";
 String testbefehl4 = "D000000001000";
@@ -30,6 +30,35 @@ class Command {
     void print() {
       Serial.print(type + " -> " + color0 + "; " + color1 + "; " + duration);
       Serial.println();
+    }
+
+    void execute(){
+      if(type == "L") {
+        Serial.print("Set LED 1 to (");
+        Serial.print(color0.substring(0,2));
+        Serial.print(",");
+        Serial.print(color0.substring(3,5));
+        Serial.print(",");
+        Serial.print(color0.substring(4,6));
+        Serial.print(")");
+        Serial.println();
+
+        Serial.print("Set LED 2 to (");
+        Serial.print(color1.substring(0,2));
+        Serial.print(",");
+        Serial.print(color1.substring(3,5));
+        Serial.print(",");
+        Serial.print(color1.substring(4,6));
+        Serial.print(")");
+        Serial.println();
+      }
+      if(type == "D") {
+        Serial.print("Warte ");
+        Serial.print(duration);
+        Serial.print(" ms");
+        Serial.println();
+      }
+
     }
 };
 
@@ -67,11 +96,15 @@ void setup() {
 }
 
 void loop() {
-  currendCommand.print();
+  currendCommand.execute();
   currendCommand = testbefehl1;
-  currendCommand.print();
+  currendCommand.execute();
   currendCommand = testbefehl2;
-  currendCommand.print();
+  currendCommand.execute();
+  currendCommand = testbefehl3;
+  currendCommand.execute();
+  currendCommand = testbefehl4;
+  currendCommand.execute();
   delay(1000);
 
 }
