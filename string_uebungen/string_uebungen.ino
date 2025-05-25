@@ -36,36 +36,37 @@ class Command {
 class Program {
   private:
     int numberCommands = 0;
-    String programString;
+    int idxCommand = 0;
+    String programString = "LB0B0B0";
 
   public:
-    Program(String program) {
+
+    void setProgramString(String program) {
       programString = program;
-      for (uint8_t i=0; i<programString.length(); i++){
+      for (uint8_t i=0; i < programString.length(); i++){
         if (programString[i] == ';'){
           numberCommands++;
         }
       }
-      Serial.print("Programm ");
+      Serial.print("Program ");
       Serial.println(programString);
       Serial.print("-> ");
       Serial.print(numberCommands);
-      Serial.println(" commands");
-    }
+      Serial.println(" commands");    }
 
 };
 
 Command currendCommand("D1000;");
-Command currendProgram(testprogramm);
+Program currendProgram;
 
 void setup() {
     Serial.begin(115200);
     Serial.println(testprogramm);
     currendCommand = Command("D1000");
+    currendProgram.setProgramString(testprogramm);
 }
 
 void loop() {
-  currendProgram = new Program(testprogramm);
   currendCommand.print();
   currendCommand = testbefehl1;
   currendCommand.print();
