@@ -11,6 +11,8 @@
   <p>BLE state: <strong><span id="bleState" style="color:#d13a30;">Disconnected</span></strong></p>
   <h2>Fetched Value</h2>
   <p><span id="valueContainer">NaN</span></p>
+  <div id="led1" style="width:100px; height: 100px; background-color: grey;"></div>
+  <div id="led2" style="width:100px; height: 100px; background-color: lightgrey;"></div>
   <p>Last reading: <span id="timestamp"></span></p>
 </body>
 <script>
@@ -20,6 +22,8 @@
     const retrievedValue = document.getElementById('valueContainer');
     const bleStateContainer = document.getElementById('bleState');
     const timestampContainer = document.getElementById('timestamp');
+    const led1 = document.getElementById('led1');
+    const led2 = document.getElementById('led2');
 
     //Define BLE Device Specs
     var deviceName ='Ball 1';
@@ -107,6 +111,10 @@
         const newValueReceived = new TextDecoder().decode(event.target.value);
         console.log("Characteristic value changed: ", newValueReceived);
         retrievedValue.innerHTML = newValueReceived;
+        if(newValueReceived.charAt(0) === 'L'){
+            led1.style.backgroundColor = "#" + newValueReceived.substring(1,7);
+            led2.style.backgroundColor = "#" + newValueReceived.substring(7,13);
+        }
         timestampContainer.innerHTML = getDateTime();
     }
 
