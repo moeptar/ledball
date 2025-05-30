@@ -58,24 +58,37 @@ module outerUpper() {
 }
 
 module auflage(){
-  cube([2,18,5]);
+  cube([2,18,9]);
+
+  color("green")
+  translate([1.5,0,4])
+  cube([1,1,1]);
+    
+  color("green")
+  translate([1.5,17,4])
+  cube([1,1,1]);
 
   translate([26,2.5,0])
-  cube([2,12,2]);
+  cube([2,13,2]);
+
+  color("red")
+  translate([25,2.5,7])
+  cube([3,13,2.5]);
 
   translate([0,2.5,0])
   cube([28,2,2]);
-  translate([26,2.5,0])
-  cube([2,2,5]);
+  translate([26.5,2.5,0])
+  cube([1.5,2,9]);
 
   translate([0,13.5,0])
   cube([28,2,2]);
-  translate([26,13.5,0])
-  cube([2,2,5]);
+  translate([26.5,13.5,0])
+  cube([1.5,2,9]);
     
 
 }
-auflage();
+//auflage();
+//battery();
 //color("red", 0.25)
 //esp();
 //difference(){
