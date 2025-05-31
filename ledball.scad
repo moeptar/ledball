@@ -2,6 +2,8 @@
 // 1,8 / 2,4 / 2,5 x 0,45-0,9-0,45 / 1,8 x 0,3 / 0,45
 // https://www.reddit.com/r/esp32/comments/1hy62lc/battery_monitoring_on_esp32s3_super_mini_dev_board/
 //https://www.pangodream.es/esp32-getting-battery-charging-level
+// https://how2electronics.com/esp32-with-bmi160-accelerometer-gyroscope-sensor/
+
 
 
 
@@ -64,14 +66,6 @@ module outerUpper() {
 module auflage(){
   cube([2,18,9]);
 
-//  color("green")
-//  translate([1.5,0,4])
-//  cube([1,1,1]);
-    
-//  color("green")
-//  translate([1.5,17,4])
-//  cube([1,1,1]);
-
   translate([26,2.5,0])
   cube([2,13,2]);
 
@@ -101,7 +95,7 @@ module usbSupport(){
 }
 
 module usbOpening(){
-  cube([5,9,5]);
+  cube([6,9,5]);
 }
 
 module dummy(){
@@ -110,27 +104,18 @@ module dummy(){
   esp();
 }
 
-color("green", 0.25)
-translate([-19,-10,-5])
-dummy();
-
-color("black", 0.25)
-translate([25 ,-4.5,6])
-usbOpening();
+module printSupport() {
+    translate([-1,-1,0])
+    cube([2,2,inner_radius_inner+2]);
+}
 
 translate([-1,-9,0])
 usbSupport();
-//translate([0,-9,0])
-//usbSupport();
-//color("red", 0.25)
-//esp();
-//difference(){
-//  color("red", 0.25)
-//  translate([-1,-1,0])
-//  cube([25, 20, 8.5]);
-//  esp();
-//}
-//battery();
-color("red", 0.25)
-innerUpper();
+printSupport();
+
+difference(){
+  innerUpper();
+  translate([24 ,-4.5,6])
+  usbOpening();
+}
 //outerUpper()
