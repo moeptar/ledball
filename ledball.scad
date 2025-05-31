@@ -1,5 +1,9 @@
 // ‎3,8 x 2,1 x 0,9 cm
 // 1,8 / 2,4 / 2,5 x 0,45-0,9-0,45 / 1,8 x 0,3 / 0,45
+// https://www.reddit.com/r/esp32/comments/1hy62lc/battery_monitoring_on_esp32s3_super_mini_dev_board/
+//https://www.pangodream.es/esp32-getting-battery-charging-level
+
+
 
 outer_diameter = 70;
 outer_thickness = 5;
@@ -60,13 +64,13 @@ module outerUpper() {
 module auflage(){
   cube([2,18,9]);
 
-  color("green")
-  translate([1.5,0,4])
-  cube([1,1,1]);
+//  color("green")
+//  translate([1.5,0,4])
+//  cube([1,1,1]);
     
-  color("green")
-  translate([1.5,17,4])
-  cube([1,1,1]);
+//  color("green")
+//  translate([1.5,17,4])
+//  cube([1,1,1]);
 
   translate([26,2.5,0])
   cube([2,13,2]);
@@ -84,11 +88,40 @@ module auflage(){
   cube([28,2,2]);
   translate([26.5,13.5,0])
   cube([1.5,2,9]);
-    
-
 }
-//auflage();
-//battery();
+
+module usbSupport(){
+  cube([2,18,9]);
+    
+  translate([-inner_radius_inner,2.5,7])
+  cube([inner_radius_inner*2,2,2]);
+
+  translate([-inner_radius_inner,13.5,7])
+  cube([inner_radius_inner*2,2,2]);
+}
+
+module usbOpening(){
+  cube([5,9,5]);
+}
+
+module dummy(){
+  cube([38, 21, 9]);  
+  translate([20,1.5,9])
+  esp();
+}
+
+color("green", 0.25)
+translate([-19,-10,-5])
+dummy();
+
+color("black", 0.25)
+translate([25 ,-4.5,6])
+usbOpening();
+
+translate([-1,-9,0])
+usbSupport();
+//translate([0,-9,0])
+//usbSupport();
 //color("red", 0.25)
 //esp();
 //difference(){
@@ -98,6 +131,6 @@ module auflage(){
 //  esp();
 //}
 //battery();
-//color("red", 0.25)
-//innerUpper();
-//outerUpper();
+color("red", 0.25)
+innerUpper();
+//outerUpper()
