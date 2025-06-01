@@ -12,31 +12,27 @@
 #include <BLEServer.h>
 #include <BLEUtils.h>
 #include <BLE2902.h>
+#include <FastLED.h>
 
 #define BALL_NAME "Ball 1"
 
 #define SERVICE_UUID             "26baf7e5-dc66-494d-af84-1e5a9074ff46"
 #define BALL_CHARACTERISTIC_UUID "85d17ec3-1385-4b86-b0af-c473d77a45b3"
-
 #define RESOLUTION 8
 
-#define RED_1 5  // 1
-#define GREEN_1 4 // 2
-#define BLUE_1 2 // 4
-
-#define RED_2 18 // 5
-#define GREEN_2 19 // 6
-#define BLUE_2 21 // 7
+#define NUM_LEDS 1
+#define DATA_PIN 48
 
 BLEServer* pServer = NULL;
 BLECharacteristic* pBallCharacteristic = NULL;
 bool deviceConnected = false;
 bool oldDeviceConnected = false;
 
-String testprogramm = "LFF000000FF00;D1000;L00FF000000FF;D2000;L0000FFFF0000;D1500;";
-String testprogramm2 = "LFF000000FF00;D250;L00FF000000FF;D500;L0000FFFF0000;D1000;";
+CRGB leds[NUM_LEDS];
 
-String currentProgram = testprogramm2;
+String testprogramm = "LFF0000;D250;L00FF00;D500;L0000FF;D1000;";
+
+String currentProgram = testprogramm;
 int currentIndex;
 int nextIndex;
 
@@ -52,21 +48,11 @@ class MyServerCallbacks: public BLEServerCallbacks {
   }
 };
 
-void setupLed(){
-  analogWriteResolution(RED_1, RESOLUTION);
-  analogWriteResolution(GREEN_1, RESOLUTION);
-  analogWriteResolution(BLUE_1, RESOLUTION);
-
-  analogWriteResolution(RED_2, RESOLUTION);
-  analogWriteResolution(GREEN_2, RESOLUTION);
-  analogWriteResolution(BLUE_2, RESOLUTION);
-}
-
 void setupBluetooth() {
   BLEDevice::init(BALL_NAME);
   pServer = BLEDevice::createServer();
   pServer->setCallbacks(new MyServerCallbacks());
-  
+
   BLEService *pService = pServer->createService(SERVICE_UUID);
 
   pBallCharacteristic = pService->createCharacteristic(
@@ -111,18 +97,15 @@ void performAction(String actionString){
   Serial.println(actionString);
   switch (actionString.charAt(0)){
     case 'L': // LED
-      analogWrite(RED_1, substringHexToInt(actionString, 1, 3));
-      analogWrite(GREEN_1, substringHexToInt(actionString, 3, 5));
-      analogWrite(BLUE_1, substringHexToInt(actionString, 5, 7));
-
-      analogWrite(RED_2, substringHexToInt(actionString, 7, 9));
-      analogWrite(GREEN_2, substringHexToInt(actionString, 9, 11));
-      analogWrite(BLUE_2, substringHexToInt(actionString, 11, 13));
+      leds[0].r = substringHexToInt(actionString, 1, 3);
+      leds[0].g = substringHexToInt(actionString, 3, 5);
+      leds[0].b = substringHexToInt(actionString, 5, 7);
+      FastLED.show();
       break;
     case 'D': // DELAY
       delay(actionString.substring(1).toInt());
       break;
-  }  
+  }
 }
 
 int substringHexToInt(String text, int start, int end){
@@ -140,7 +123,7 @@ void nextProgramStep(){
 
 void setup() {
   Serial.begin(115200);
-  setupLed();
+  FastLED.addLeds<NEOPIXEL, DATA_PIN>(leds, NUM_LEDS);
   setupBluetooth();
 }
 
