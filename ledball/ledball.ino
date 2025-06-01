@@ -7,6 +7,7 @@
 // https://randomnerdtutorials.com/esp32-web-bluetooth/
 // https://www.espboards.dev/esp32/esp32-s3-super-mini/
 // https://x10hosting.com/
+// https://how2electronics.com/esp32-with-bmi160-accelerometer-gyroscope-sensor/
 
 #include <BLEDevice.h>
 #include <BLEServer.h>
@@ -17,14 +18,17 @@
 #define BALL_NAME "Ball 1"
 
 #define SERVICE_UUID             "26baf7e5-dc66-494d-af84-1e5a9074ff46"
-#define BALL_CHARACTERISTIC_UUID "85d17ec3-1385-4b86-b0af-c473d77a45b3"
+#define COMMAND_CHARACTERISTIC_UUID "85d17ec3-1385-4b86-b0af-c473d77a45b3"
+#define PROGRAMM_CHARACTERISTIC_UUID "85d17ec3-1385-4b86-b0af-c473d77a45b4"
 #define RESOLUTION 8
 
 #define NUM_LEDS 1
 #define DATA_PIN 48
 
 BLEServer* pServer = NULL;
-BLECharacteristic* pBallCharacteristic = NULL;
+BLECharacteristic* pCommandCharacteristic = NULL;
+BLECharacteristic* pProgramCharacteristic = NULL;
+
 bool deviceConnected = false;
 bool oldDeviceConnected = false;
 
@@ -48,6 +52,15 @@ class MyServerCallbacks: public BLEServerCallbacks {
   }
 };
 
+class MyCharacteristicCallbacks : public BLECharacteristicCallbacks {
+  void onWrite(BLECharacteristic* pProgramCharacteristic) {
+    String value = pProgramCharacteristic->getValue();
+    if (value.length() > 0) {
+      currentProgram = value;
+    }
+  }
+};
+
 void setupBluetooth() {
   BLEDevice::init(BALL_NAME);
   pServer = BLEDevice::createServer();
@@ -55,14 +68,21 @@ void setupBluetooth() {
 
   BLEService *pService = pServer->createService(SERVICE_UUID);
 
-  pBallCharacteristic = pService->createCharacteristic(
-                      BALL_CHARACTERISTIC_UUID,
+  pCommandCharacteristic = pService->createCharacteristic(
+                      COMMAND_CHARACTERISTIC_UUID,
                       BLECharacteristic::PROPERTY_READ
                       | BLECharacteristic::PROPERTY_NOTIFY
                     );
+  
+  // Create the ON button Characteristic
+  pProgramCharacteristic = pService->createCharacteristic(
+                      PROGRAMM_CHARACTERISTIC_UUID,
+                      BLECharacteristic::PROPERTY_WRITE
+                    );
+  pProgramCharacteristic->setCallbacks(new MyCharacteristicCallbacks());
 
-  pBallCharacteristic->addDescriptor(new BLE2902());
-
+  pCommandCharacteristic->addDescriptor(new BLE2902());
+  pProgramCharacteristic->addDescriptor(new BLE2902());
   pService->start();
 
   BLEAdvertising *pAdvertising = BLEDevice::getAdvertising();
@@ -89,8 +109,8 @@ void checkConnection(){
 
 void performAction(String actionString){
   if (deviceConnected) {
-    pBallCharacteristic->setValue(actionString);
-    pBallCharacteristic->notify();
+    pCommandCharacteristic->setValue(actionString);
+    pCommandCharacteristic->notify();
     Serial.print("New value notified: ");
     Serial.println(actionString);
   }

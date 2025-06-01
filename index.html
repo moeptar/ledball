@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="de">
 <head>
     <title>LED Ball</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -9,26 +9,32 @@
   <button id="connectBleButton">Connect to Ball</button>
   <button id="disconnectBleButton">Disconnect from Ball</button>
   <p>BLE state: <strong><span id="bleState" style="color:#d13a30;">Disconnected</span></strong></p>
+  <h2>Set programm</h2>
+  <p>fixed Program1: LFF00FF;D250;L00FFFF;D250;LFFFF00;D250;</p>
+  <p>fixed Program2: LFF0000;D1000;L00FF00;D1000;L0000FF;1000;</p>
+  <button id="program1Button">Program1</button>
+  <button id="program2Button">Program2</button>
   <h2>Fetched Value</h2>
   <p><span id="valueContainer">NaN</span></p>
   <div id="led1" style="width:100px; height: 100px; background-color: grey;"></div>
-  <div id="led2" style="width:100px; height: 100px; background-color: lightgrey;"></div>
   <p>Last reading: <span id="timestamp"></span></p>
 </body>
 <script>
     // DOM Elements
     const connectButton = document.getElementById('connectBleButton');
     const disconnectButton = document.getElementById('disconnectBleButton');
+    const program1Button = document.getElementById('program1Button');
+    const program2Button = document.getElementById('program2Button');
     const retrievedValue = document.getElementById('valueContainer');
     const bleStateContainer = document.getElementById('bleState');
     const timestampContainer = document.getElementById('timestamp');
     const led1 = document.getElementById('led1');
-    const led2 = document.getElementById('led2');
 
     //Define BLE Device Specs
     var deviceName ='Ball 1';
     var bleService = '26baf7e5-dc66-494d-af84-1e5a9074ff46';
     var ballCharacteristic = '85d17ec3-1385-4b86-b0af-c473d77a45b3';
+    var programCharacteristic = '85d17ec3-1385-4b86-b0af-c473d77a45b4';
 
     //Global Variables to Handle Bluetooth
     var bleServer;
@@ -44,6 +50,9 @@
 
     // Disconnect Button
     disconnectButton.addEventListener('click', disconnectDevice);
+
+    program1Button.addEventListener('click', () => writeOnProgramCharacteristic("LFF00FF;D250;L00FFFF;D250;LFFFF00;D250;"));
+    program2Button.addEventListener('click', () => writeOnProgramCharacteristic("LFF0000;D1000;L00FF00;D1000;L0000FF;1000;"));
 
     // Check if BLE is available in your Browser
     function isWebBluetoothEnabled() {
@@ -113,9 +122,26 @@
         retrievedValue.innerHTML = newValueReceived;
         if(newValueReceived.charAt(0) === 'L'){
             led1.style.backgroundColor = "#" + newValueReceived.substring(1,7);
-            led2.style.backgroundColor = "#" + newValueReceived.substring(7,13);
         }
         timestampContainer.innerHTML = getDateTime();
+    }
+
+    function writeOnProgramCharacteristic(value){
+      console.log(bleServiceFound);
+        if (bleServer && bleServer.connected) {
+            bleServiceFound.getCharacteristic(programCharacteristic)
+            .then(characteristic => {
+                console.log("Found the Program characteristic: ", characteristic.uuid);
+                const data = Uint8Array.from(Array.from(value).map(letter => letter.charCodeAt(0)));
+                return characteristic.writeValue(data);
+            })
+            .catch(error => {
+                console.error("Error writing to the Program characteristic: ", error);
+            });
+        } else {
+            console.error ("Bluetooth is not connected. Cannot write to characteristic.")
+            window.alert("Bluetooth is not connected. Cannot write to characteristic. \n Connect to BLE first!")
+        }
     }
 
     function disconnectDevice() {
