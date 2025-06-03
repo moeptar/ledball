@@ -70,4 +70,77 @@ module innerFilled() {
 
 //color("green", 0.15)
 //rotate([90,0,0])
-outer();
+//outer();
+
+module esp() {
+  cube([23.5, 18, 1.5]);
+}
+module bmi60() {
+  cube([18, 13, 1.5]);
+}
+
+module battery() {
+  cube([40, 20, 7.5]);
+}
+module miniHalterung(){
+   // 13 x 18
+   // 23,5 x 18 x 1,5
+   // 40 x 20 x 7,5
+   esp();
+   
+   translate([0,0, 10])
+   bmi60();
+   
+   translate([0,0, 20])
+   battery();
+
+}
+
+// miniHalterung();
+
+//color("black")
+//translate([1.5 ,2,1])
+//cube([23.5, 18, 1.5]);
+
+//color("green", 0.25)
+
+module rahmen() {
+  difference() {
+    color("red", 0.25)
+    cube([25,22,9]);
+        
+    // luft
+    translate([2, 2.5, -1])
+    cube([24,17,15]);
+        
+    // schlitz
+    translate([1,1.5,1])
+    cube([24.5, 19, 1.6]);
+      
+    // usb
+    translate([-5,6.25,2.5])
+    cube([10, 10, 5]);
+  }
+}
+
+module rahmen2() {
+  difference() {
+    cube([25,20.4,6]);
+        
+    // luft
+    translate([2, 1.7, -1])
+    cube([24,17,15]);
+        
+    // schlitz
+    translate([1,0.8,0.8])
+    cube([24.5, 19, 1.6]);
+      
+    // usb
+    translate([-5,5.6,1.40])
+    cube([10, 10, 4]);
+  }
+}
+
+rahmen2();
+//translate([1,2,3])
+//esp();
