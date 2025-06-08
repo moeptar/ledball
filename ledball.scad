@@ -26,12 +26,12 @@ module electronicSpace(){
 
 module drillingInner(){
   rotate([22.5,0,0])
-  translate([0,0,15])
-  cylinder(h=15, d=3, $fn=10);
+  translate([0,0,0])
+  cylinder(h=45, d=3, $fn=10);
 
   rotate([-22.5,0,0])
-  translate([0,0,15])
-  cylinder(h=15, d=3, $fn=10);
+  translate([0,0,0])
+  cylinder(h=45, d=3, $fn=10);
 }
 
 module drillingOuter(){
@@ -70,7 +70,7 @@ module innerFilledBox() {
     cube([100,100,100]);
       
     // box Öffnung
-    cube([50,22,14], center=true);
+    cube([50,24,16], center=true);
       
     // usb
     cube([120,10,10], center = true);
@@ -85,14 +85,14 @@ module innerFilledBox() {
 
 module innerFilledBoxTest() {
   difference() {
-    cube([50.8,22.8,14.8], center = true);
+    cube([51.6,25.6,16.8], center = true);
       
     // halbkugel
     translate([-50,-50,-100])
     cube([100,100,100]);
       
     // box Öffnung
-    cube([50,22,14], center=true);
+    cube([50,24,16], center=true);
       
     // usb
     cube([120,10,10], center = true);
@@ -103,7 +103,8 @@ module innerFilledBoxTest() {
   }
 }
 
-innerFilledBox();
+rotate([180,0,0])
+innerFilledBoxTest();
 
 //color("red", 0.25)
 //outer();
