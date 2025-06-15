@@ -17,7 +17,7 @@
 #include <BLE2902.h>
 #include <FastLED.h>
 
-#define BALL_NAME "Ball 2"
+#define BALL_NAME "Ball 1"
 
 #define SERVICE_UUID             "26baf7e5-dc66-494d-af84-1e5a9074ff46"
 #define COMMAND_CHARACTERISTIC_UUID "85d17ec3-1385-4b86-b0af-c473d77a45b3"
@@ -27,7 +27,7 @@
 #define NUM_LEDS 1
 #define DATA_PIN 48
 
-#define FADE_STEPS 10
+#define FADE_STEPS 100
 
 BLEServer* pServer = NULL;
 BLECharacteristic* pCommandCharacteristic = NULL;
@@ -38,7 +38,7 @@ bool oldDeviceConnected = false;
 
 CRGB leds[NUM_LEDS];
 
-//String testprogramm = "LFF0000;D1000;L00FF00;D1000;L0000FF;D1000;FFF00001000;F00FF001000;F0000FF1000;";
+//String testprogramm = "LFF0000;D1000;L00FF00;D1000;L0000FF;D1000;";
 String testprogramm = "L0000001;D1000;FFF00001000;F0000001000;F00FF001000;F0000001000;F0000FF1000;F0000001000;";
 
 String currentProgram = testprogramm;
@@ -127,38 +127,16 @@ void performAction(String actionString){
     Serial.print("New value notified: ");
     Serial.println(actionString);
   }
-  Serial.println(actionString);
   switch (actionString.charAt(0)){
     case 'L': // LED
-      leds[0].r = substringHexToInt(actionString, 1, 3);
-      leds[0].g = substringHexToInt(actionString, 3, 5);
-      leds[0].b = substringHexToInt(actionString, 5, 7);
+      leds[0] = substringHexToInt(actionString, 1, 7);
       FastLED.show();
       break;
     case 'F': // LED
-      Serial.print("Fade action ");
-      Serial.println(actionString);
-
       fadeStepDuration = actionString.substring(7).toInt() / FADE_STEPS;
       fadePerStepRed = (substringHexToInt(actionString, 1, 3) - leds[0].r) / FADE_STEPS;
       fadePerStepGreen = (substringHexToInt(actionString, 3, 5) - leds[0].g) / FADE_STEPS;
       fadePerStepBlue = (substringHexToInt(actionString, 5, 7) - leds[0].b) / FADE_STEPS;
-
-      Serial.println(actionString.substring(7).toInt());
-      Serial.println(FADE_STEPS);
-      Serial.println(fadeStepDuration);
-      
-      Serial.println(leds[0].r);
-      Serial.println(substringHexToInt(actionString, 1, 3));
-      Serial.println(fadePerStepRed);
-
-      Serial.println(leds[0].g);
-      Serial.println(substringHexToInt(actionString, 3, 5));
-      Serial.println(fadePerStepGreen);
-
-      Serial.println(leds[0].b);
-      Serial.println(substringHexToInt(actionString, 5, 7));
-      Serial.println(fadePerStepBlue);
 
       fadeStepsRemaining = FADE_STEPS; 
       isFading = true;
@@ -190,22 +168,18 @@ void setup() {
 
 void fade() {
   if(fadeStepsRemaining > 0){
-/*
-    Serial.print("fading");
-    Serial.println(leds[0].r);
-    Serial.println(leds[0].g);
-    Serial.println(leds[0].b);
-*/    
     leds[0].r += fadePerStepRed;
     leds[0].g += fadePerStepGreen;
     leds[0].b += fadePerStepBlue;
-
-/*
-    Serial.println(leds[0].r);
-    Serial.println(leds[0].g);
-    Serial.println(leds[0].b);
-*/
     FastLED.show();
+
+    char s[] = "L000000";
+    sprintf (s, "L%02x%02x%02x", leds[0].r, leds[0].g, leds[0].b);
+    Serial.println (s);
+
+    pCommandCharacteristic->setValue(s);
+    pCommandCharacteristic->notify();
+
     fadeStepsRemaining--;
     delay(fadeStepDuration);
   }else{
