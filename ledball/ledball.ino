@@ -24,8 +24,9 @@
 #define PROGRAMM_CHARACTERISTIC_UUID "85d17ec3-1385-4b86-b0af-c473d77a45b4"
 #define RESOLUTION 8
 
-#define NUM_LEDS 1
-#define DATA_PIN 48
+#define NUM_LEDS 2
+#define DATA_PIN 1
+// 48
 
 #define FADE_STEPS 100
 
@@ -130,6 +131,7 @@ void performAction(String actionString){
   switch (actionString.charAt(0)){
     case 'L': // LED
       leds[0] = substringHexToInt(actionString, 1, 7);
+      leds[1] = substringHexToInt(actionString, 1, 7);
       FastLED.show();
       break;
     case 'F': // LED
@@ -171,6 +173,9 @@ void fade() {
     leds[0].r += fadePerStepRed;
     leds[0].g += fadePerStepGreen;
     leds[0].b += fadePerStepBlue;
+    leds[1].r += fadePerStepRed;
+    leds[1].g += fadePerStepGreen;
+    leds[1].b += fadePerStepBlue;
     FastLED.show();
 
     char s[] = "L000000";

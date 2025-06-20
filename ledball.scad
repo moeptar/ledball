@@ -13,16 +13,9 @@ outer_radius_inner = ( outer_diameter / 2) - outer_thickness;
 inner_radius_outer = outer_radius_inner;
 inner_radius_inner = outer_radius_inner - inner_thickness;
 electronicSpace_width = 24;
-electronicSpace_length = 41;
-electronicSpace_hight = 12;
-
-module usbOpening(){
-  cube([10,11,6]);
-}
-
-module electronicSpace(){
-  cube([electronicSpace_length , electronicSpace_width , electronicSpace_hight]);
-}
+electronicSpace_length = 52;
+electronicSpace_hight = 14;
+inner_hole = 14;
 
 module drillingInner(){
   rotate([22.5,0,0])
@@ -61,75 +54,91 @@ module outer() {
   }
 }
 
-module innerFilledBox() {
+module inner() {
   difference() {
-    sphere(inner_radius_outer, $fn=50);
+    sphere(inner_radius_outer, $fn=100);
       
     // halbkugel
     translate([-50,-50,-100])
     cube([100,100,100]);
       
-    // box Öffnung
-    cube([50,24,16], center=true);
+    // electronic hole
+    cube([electronicSpace_length + 1,electronicSpace_width + 1,electronicSpace_hight + 1], center=true);
       
     // usb
-    cube([120,10,10], center = true);
-      
-    // LED
-    translate([0,0,6])
-    cube([6,6,6], center = true);
+    cube([120,inner_hole,inner_hole], center = true);
       
     drillingInner();
   }
 }
 
-module schalter(){
-  translate([-5.8 / 2, 5.8/2, 5.1 / 2]){
-    cube([5.8,5.8,5.1], center = true);
+module innerBox() {
 
-    translate([0,0,5.1/2 + 2.5/2])
-    cube([3.5,2.9,2.5], center = true);
-    
-    translate([0,0,5.1 / 2 + 5.1 / 2])
-    cube([2,2.4, 5.1], center = true);
-    }
-}
-
-module innerFilledBoxTest() {
-  innenLaenge =  50;
-  innenBreite = 24; 
-  innenHoehe = 16;
-  dickeVorne = 1.6;
-  dickeSeite = 1.6;
-  dickeUnten = 1.6;
-  oeffnungBreite = 10;
-  oeffnungHoehe = 10;
+  thickness = 2;
 
   difference() {
-    cube([innenLaenge + dickeVorne * 2, innenBreite + dickeSeite *2 ,innenHoehe / 2 + dickeUnten]);
-      
+    cube([electronicSpace_length + 2 * thickness, electronicSpace_width + 2 * thickness,electronicSpace_hight/2 + thickness]);      
+     
     // box Öffnung
-    translate([dickeVorne, dickeSeite, dickeUnten])
-    cube([innenLaenge,innenBreite,16]);
+    translate([thickness, thickness, thickness])
+    cube([electronicSpace_length,electronicSpace_width,electronicSpace_hight]);
       
     // usb
-    translate([0, dickeSeite + innenBreite/2 - 5, dickeUnten + innenHoehe / 4])
-    cube([innenLaenge + 2* dickeVorne, oeffnungHoehe, oeffnungBreite]);
-      
-    // LED
-    translate([dickeVorne + innenLaenge/2 -3, dickeSeite+ innenBreite/2 -3,-3])
-    cube([6,6,6]);  
+    translate([-20,electronicSpace_width/2 - inner_hole / 2 + 2 ,electronicSpace_hight/2 - inner_hole / 2 + 2])
+    cube([100, inner_hole, inner_hole / 2]);
   }
-}  
-    
-  //halterung
-//  translate([dickeVorne, dickeSeite, dickeUnten])
-//  cube([24,2,3]);
-  
-//  translate([dickeVorne, innenBreite, dickeUnten])
-//  cube([24,2,3]);  
+}
 
 module chipSupport(){
+
+  // front usbhole
+  difference() {
+    cube([1,electronicSpace_width, electronicSpace_hight]);
+      // 10,4
+    translate([-5,electronicSpace_width / 2 - 10/2,4])
+    cube([20, 10, 4]);
+  }
+  
+  // esp support
+  translate([1,5.5,0])
+  cube([24, 1, 3]);
+  translate([25,5.5,0])
+  cube([2, 1, 6]);
+  
+  translate([1,electronicSpace_width - 6.5,0])
+  cube([24, 1, 3]);
+  translate([25,electronicSpace_width - 6.5,0])
+  cube([2, 1, 6]);
+  
+  // back buttonhole
+  difference(){
+    translate([electronicSpace_length - 1,0,0])
+    cube([1,electronicSpace_width, electronicSpace_hight]);
+  
+    translate([electronicSpace_length -2,electronicSpace_width / 2 - 4.5/2,4.5])
+    cube([4, 4.5, 5]);
+  }
+    
+  // rigth / left
+  cube([electronicSpace_length,2, 2]);
+  translate([0,electronicSpace_width - 2,0])
+  cube([electronicSpace_length,2, 2]);
+ 
+  // button support
+  difference(){
+    translate([electronicSpace_length-7, electronicSpace_width/2 - 4,3])
+    cube([6,8,8]);
+
+    translate([electronicSpace_length-7, electronicSpace_width/2 - 3,4])
+    cube([6,6,6]);
+    
+    translate([electronicSpace_length-4, electronicSpace_width/2 - 2.5,7])
+    rotate([90,0,0])
+    cylinder(h=2, d=3, $fn=10);  
+  }
+}
+
+module chipSupportOld(){
   innenLaenge =  49;
   innenBreite = 23;
   innenHoehe = 16;
@@ -148,7 +157,7 @@ module chipSupport(){
   // usb
   difference() {
     translate([0,4.5,0])
-    cube([1, 14, 10]);
+    cube([1, 14, electronicSpace_hight]);
       
     translate([-0.5,6.5,4])
     cube([2, holeSize, 4]);
@@ -175,89 +184,6 @@ module chipSupport(){
   
   // button stuetze
   translate([innenLaenge-cubeSize-0.5, innenBreite/2 - 3,0])
-  cube([cubeSize,6,3]);
-  translate([innenLaenge-cubeSize -1.5, innenBreite/2 - 0.5,0])
-  cube([1,1,4]);
-  translate([innenLaenge-cubeSize +2, innenBreite/2 - 5,0])
-  cube([2,2,6]);  
-  translate([innenLaenge-cubeSize +2, innenBreite/2 + 3,0])
-  cube([2,2,6]);
-
-  
-  // button hole
- difference() {
-    translate([innenLaenge-1,4.5,0])
-    cube([1, 14, 10]);
-      
-    translate([innenLaenge - 1.5,10,4])
-    cube([2, 3.5, 4]);
-  }  
-//  
-  
-}
-
-//rotate([180,0,0])
-//color("red", 0.25)
-//innerFilledBoxTest();
-
-//translate([1.6,1.6,1.6])
-//chipSupport();
-
-
-  innenLaenge =  49;
-  innenBreite = 23;
-  innenHoehe = 16;
-  cubeSize = 6;
-  espLaenge = 25;
-  holeSize = 10;
-
-/**
-  // button stuetze
-  translate([innenLaenge-cubeSize-0.5, innenBreite/2 - 3,0])
-  cube([cubeSize,6,3]);
-  translate([innenLaenge-cubeSize -1.5, innenBreite/2 - 0.5,0])
-  cube([1,1,4]);
-  translate([innenLaenge-cubeSize +2, innenBreite/2 - 5,0])
-  cube([2,2,6]);  
-  translate([innenLaenge-cubeSize +2, innenBreite/2 + 3,0])
-  cube([2,2,6]);
-
-  
-  // button hole
- difference() {
-    translate([innenLaenge-1,4.5,0])
-    cube([1, 14, 10]);
-      
-    translate([innenLaenge - 1.5,10,3])
-    cube([2, 3.5, 5]);
-  }  
-**/
-/**
-  // button stuetze
-  translate([innenLaenge-cubeSize-0.5, innenBreite/2 - 3,0])
-  cube([cubeSize,6,3]);
-  translate([innenLaenge-cubeSize -1.5, innenBreite/2 - 3,0])
-  cube([1,6,4]);
-  translate([innenLaenge-cubeSize -1.5, innenBreite/2 - 4,0])
-  cube([6.5,1,9]);  
-  translate([innenLaenge-cubeSize -1.5, innenBreite/2 + 3,0])
-  cube([6.5,1,9]);
-  color("red")
-  translate([innenLaenge-cubeSize +4, innenBreite/2-7 + 3,9])
-  cube([1,8,1]);
-  
-  // button hole
- difference() {
-    translate([innenLaenge-1,4.5,0])
-    cube([1, 14, 10]);
-      
-    translate([innenLaenge - 1.5, 9.25,3])
-    cube([2, 4.5, 5]);
-  }  
-**/
-
-  // button stuetze
-  translate([innenLaenge-cubeSize-0.5, innenBreite/2 - 3,0])
   cube([cubeSize,6,2]);
 
   // oben
@@ -266,33 +192,38 @@ module chipSupport(){
   
   translate([innenLaenge - cubeSize - 3, innenBreite/2 +3 ,4.25])
   cube([cubeSize + 2,1.5,2]);
-  translate([innenLaenge - cubeSize - 3, innenBreite/2 +1 ,4.25])
-  cube([2,2,2]);
+  translate([innenLaenge - cubeSize - 3, innenBreite/2 +1.5 ,4.25])
+  cube([2,1.5,2]);
 
-  color("red")
   translate([innenLaenge - cubeSize -3, innenBreite/2 -5 ,4.25])
   cube([cubeSize + 2,1.5,2]);
-  color("green")
   translate([innenLaenge - cubeSize - 3, innenBreite/2 -3.5 ,4.25])
-  cube([2,2,2]);
+  cube([2,1.5,2]);
   
   // button hole
  difference() {
     translate([innenLaenge-1,4.5,0])
-    cube([1, 14, 10]);
+    cube([1, 14, electronicSpace_hight]);
       
     translate([innenLaenge - 1.5, 9.25,2.5])
     cube([2, 4.5, 5]);
   }  
+}
 
-//rotate([0,90,0])
-
-//color("blue")
-//translate([-4.5,10.5,45.5])
-//schalter();
-//color("red", 0.25)
-//outer();
+//innerBox();
+//translate([2,2, 2])
+//chipSupport();
 
 
 
+//color("red", 0.2)
+//inner();
+outer();
+//rotate([180,0,0])
+//color("green", 0.2)
+//inner();
+
+//rotate([0,0,180])
+//translate([-electronicSpace_length/2,-electronicSpace_width/2,-electronicSpace_hight/2])
+//chipSupport();
 

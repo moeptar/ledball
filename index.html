@@ -11,7 +11,7 @@
   <p>BLE state: <strong><span id="bleState" style="color:#d13a30;">Disconnected</span></strong></p>
   <h2>Set programm</h2>
   <p>fixed Program1: LFF00FF;D250;L00FFFF;D250;LFFFF00;D250;</p>
-  <p>fixed Program2: LFF0000;D1000;L00FF00;D1000;L0000FF;1000;</p>
+  <p>fixed Program2: FFF00005000;D1000;F00FF005000;D1000;F0000FF50000;</p>
   <button id="program1Button">Program1</button>
   <button id="program2Button">Program2</button>
   <h2>Fetched Value</h2>
@@ -52,7 +52,6 @@
     disconnectButton.addEventListener('click', disconnectDevice);
 
     program1Button.addEventListener('click', () => writeOnProgramCharacteristic("LFF00FF;D250;L00FFFF;D250;LFFFF00;D250;"));
-    program2Button.addEventListener('click', () => writeOnProgramCharacteristic("LFF0000;D1000;L00FF00;D1000;L0000FF;1000;"));
 
     // Check if BLE is available in your Browser
     function isWebBluetoothEnabled() {
@@ -69,7 +68,7 @@
     function connectToDevice(){
         console.log('Initializing Bluetooth...');
         navigator.bluetooth.requestDevice({
-            filters: [{name: deviceName}],
+            filters: [{namePrefix: "Ball"}],
             optionalServices: [bleService]
         })
         .then(device => {
